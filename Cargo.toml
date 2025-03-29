@@ -1,0 +1,10 @@
+[package]
+name = "service-manager-ctl"
+version = "0.0.1"
+edition = "2024"
+license = "Apache-2.0 OR MIT"
+description = "CLI tool to install & manage: Windows, OpenRC, systemd, rc.d, and launchd services"
+
+[dependencies]
+clap = { version = "^4.5", features = ["derive"] }
+service-manager = { git = "https://github.com/chipsenkbeil/service-manager-rs", version = "^0.8", features = ["clap", "encoding", "serde"] }
