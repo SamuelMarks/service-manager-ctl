@@ -9,16 +9,80 @@ FYI: This wraps https://github.com/chipsenkbeil/service-manager-rs; plan to send
 
 ## `--help`
 
+    CLI tool to install & manage: Windows, OpenRC, systemd, rc.d, and launchd services
+    
     Usage: service-manager-ctl [OPTIONS] [COMMAND]
     
     Commands:
     install  deploys and instantiated the service
+    status   Get the service status info
     help     Print this message or the help of the given subcommand(s)
     
     Options:
     -d, --debug...  Turn debugging information on
     -h, --help      Print help
     -V, --version   Print version
+
+## `--version`
+
+    service-manager-ctl 0.0.1
+
+## `install`
+
+    deploys and instantiated the service
+    
+    Usage: service-manager-ctl install [OPTIONS] --label <LABEL> --program <PROGRAM>
+    
+    Options:
+      -l, --label <LABEL>
+              Label associated with the service
+              
+              E.g. `org.example.my_application`
+    
+      -p, --program <PROGRAM>
+              Path to the program to run
+              
+              E.g. `/usr/local/bin/my-program`
+    
+          --args <ARGS>
+              Arguments to use for the program
+              
+              E.g. `--arg`, `value`, `--another-arg`
+    
+      -c, --contents <CONTENTS>
+              Optional contents of the service file for a given ServiceManager to use instead of the default template
+    
+      -u, --username <USERNAME>
+              Optionally supply the user the service will run as
+              
+              If not specified, the service will run as the root or Administrator user.
+    
+      -w, --working-directory <WORKING_DIRECTORY>
+              Optionally specify a working directory for the process launched by the service
+    
+      -e, --environment <ENVIRONMENT>
+              Optionally specify a list of environment variables to be passed to the process launched by the service
+    
+      -a, --autostart
+              Specify whether the service should automatically start on reboot
+    
+          --disable-restart-on-failure
+              Optionally disable a service from restarting when it exits with a failure
+              
+              This could overwrite the platform specific service manager config.
+    
+      -h, --help
+              Print help (see a summary with '-h')
+
+## `status`
+
+    Get the service status info
+    
+    Usage: service-manager-ctl status --label <LABEL>
+    
+    Options:
+    -l, --label <LABEL>  
+    -h, --help           Print help
 
 <hr>
 

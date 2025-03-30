@@ -1,9 +1,12 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
+
 use clap::Parser;
 
 /// Parse a single key-value pair
-fn parse_key_val<T, U>(s: &str) -> Result<(T, U), Box<dyn std::error::Error + Send + Sync + 'static>>
+fn parse_key_val<T, U>(
+    s: &str,
+) -> Result<(T, U), Box<dyn std::error::Error + Send + Sync + 'static>>
 where
     T: std::str::FromStr,
     T::Err: std::error::Error + Send + Sync + 'static,
@@ -79,29 +82,12 @@ enum Commands {
         #[arg(long)]
         disable_restart_on_failure: bool,
     },
-}
 
-
-fn install_cmd() {
-    // Create a label for our service
-    let label: service_manager::ServiceLabel = "com.example.my-service".parse().unwrap();
-
-    // Get generic service by detecting what is available on the platform
-    let manager = <dyn service_manager::ServiceManager>::native()
-        .expect("Failed to detect management platform");
-
-    // Install our service using the underlying service management platform
-    manager.install(service_manager::ServiceInstallCtx {
-        label: label.clone(),
-        program: PathBuf::from("path/to/my-service-executable"),
-        args: vec![OsString::from("--some-arg")],
-        contents: None, // Optional String for system-specific service content.
-        username: None, // Optional String for alternative user to run service.
-        working_directory: None, // Optional String for the working directory for the service process.
-        environment: None, // Optional list of environment variables to supply the service process.
-        autostart: true, // Specify whether the service should automatically start upon OS reboot.
-        disable_restart_on_failure: false, // Services restart on crash by default.
-    }).expect("Failed to install");
+    /// Get the service status info
+    Status {
+        #[arg(short, long)]
+        label: String,
+    },
 }
 
 fn main() {
@@ -119,7 +105,17 @@ fn main() {
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
     match &cli.command {
-        Some(Commands::Install { label, program, args, contents, username, working_directory, environment, autostart, disable_restart_on_failure }) => {
+        Some(Commands::Install {
+            label,
+            program,
+            args,
+            contents,
+            username,
+            working_directory,
+            environment,
+            autostart,
+            disable_restart_on_failure,
+        }) => {
             // Create a label for our service
             let label: service_manager::ServiceLabel = label.parse().unwrap();
 
@@ -128,18 +124,42 @@ fn main() {
                 .expect("Failed to detect management platform");
 
             // Install our service using the underlying service management platform
-            manager.install(service_manager::ServiceInstallCtx {
-                label,
-                program: program.to_owned(),
-                args: args.to_owned(),
-                contents: contents.to_owned(),
-                username: username.to_owned(),
-                working_directory: working_directory.to_owned(),
-                environment: environment.to_owned(),
-                autostart: autostart.to_owned(),
-                disable_restart_on_failure: disable_restart_on_failure.to_owned()
-            }).unwrap()
+            manager
+                .install(service_manager::ServiceInstallCtx {
+                    label,
+                    program: program.to_owned(),
+                    args: args.to_owned(),
+                    contents: contents.to_owned(),
+                    username: username.to_owned(),
+                    working_directory: working_directory.to_owned(),
+                    environment: environment.to_owned(),
+                    autostart: autostart.to_owned(),
+                    disable_restart_on_failure: disable_restart_on_failure.to_owned(),
+                })
+                .unwrap()
         }
         None => {}
+        Some(Commands::Status { label }) => {
+            let manager = <dyn service_manager::ServiceManager>::native().unwrap();
+            match manager
+                .status(service_manager::ServiceStatusCtx {
+                    label: label.parse().unwrap(),
+                })
+                .unwrap()
+            {
+                service_manager::ServiceStatus::NotInstalled => {
+                    println!("{{\"label\": \"{label}\", \"status\": \"not_installed\"}}")
+                }
+                service_manager::ServiceStatus::Running => {
+                    println!("{{\"label\": \"{label}\", \"status\": \"running\"}}")
+                }
+                service_manager::ServiceStatus::Stopped(opt_s) => match opt_s {
+                    None => println!("{{\"label\": \"{label}\", \"status\": \"stopped\"}}"),
+                    Some(s) => println!(
+                        "{{\"label\": \"{label}\", \"status\": \"stopped\", \"details\": \"{s}\"}}"
+                    ),
+                },
+            }
+        }
     }
 }
