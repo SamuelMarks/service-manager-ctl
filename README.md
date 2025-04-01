@@ -16,6 +16,7 @@ FYI: This wraps https://github.com/chipsenkbeil/service-manager-rs; plan to send
     Commands:
     install  deploys and instantiated the service
     status   Get the service status info
+    start    Start the service
     help     Print this message or the help of the given subcommand(s)
     
     Options:
@@ -79,6 +80,16 @@ FYI: This wraps https://github.com/chipsenkbeil/service-manager-rs; plan to send
     Get the service status info
     
     Usage: service-manager-ctl status --label <LABEL>
+    
+    Options:
+    -l, --label <LABEL>  
+    -h, --help           Print help
+
+## `start`
+
+    Start the service
+    
+    Usage: service-manager-ctl start --label <LABEL>
     
     Options:
     -l, --label <LABEL>  

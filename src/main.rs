@@ -88,9 +88,15 @@ enum Commands {
         #[arg(short, long)]
         label: String,
     },
+
+    /// Start the service
+    Start {
+        #[arg(short, long)]
+        label: String,
+    },
 }
 
-fn main() {
+fn main() -> std::process::ExitCode {
     let cli = Cli::parse();
 
     // You can see how many times a particular flag or argument occurred
@@ -148,7 +154,8 @@ fn main() {
                 .unwrap()
             {
                 service_manager::ServiceStatus::NotInstalled => {
-                    println!("{{\"label\": \"{label}\", \"status\": \"not_installed\"}}")
+                    println!("{{\"label\": \"{label}\", \"status\": \"not_installed\"}}");
+                    return std::process::ExitCode::FAILURE;
                 }
                 service_manager::ServiceStatus::Running => {
                     println!("{{\"label\": \"{label}\", \"status\": \"running\"}}")
@@ -161,5 +168,17 @@ fn main() {
                 },
             }
         }
-    }
+        Some(Commands::Start { label }) => {
+            let manager = <dyn service_manager::ServiceManager>::native().unwrap();
+            match manager.start(service_manager::ServiceStartCtx {
+                label: label.parse().unwrap(),
+            }) {
+                Ok(_) => {
+                    println!("{{\"label\": \"{label}\", \"status\": \"started\"}}")
+                }
+                Err(e) => panic!("{}", e),
+            }
+        }
+    };
+    std::process::ExitCode::SUCCESS
 }
