@@ -7,7 +7,7 @@ CLI tool to install & manage: Windows, OpenRC, systemd, rc.d, and launchd servic
 
 FYI: This wraps https://github.com/chipsenkbeil/service-manager-rs; plan to send a PR to close my https://github.com/chipsenkbeil/service-manager-rs/issues/20
 
-## `--help`
+## `--help` | `help`
 
     CLI tool to install & manage: Windows, OpenRC, systemd, rc.d, and launchd services
     
@@ -17,6 +17,7 @@ FYI: This wraps https://github.com/chipsenkbeil/service-manager-rs; plan to send
     install  deploys and instantiated the service
     status   Get the service status info
     start    Start the service
+    stop     Stop the service
     help     Print this message or the help of the given subcommand(s)
     
     Options:
@@ -32,14 +33,15 @@ FYI: This wraps https://github.com/chipsenkbeil/service-manager-rs; plan to send
 
     deploys and instantiated the service
     
-    Usage: service-manager-ctl install [OPTIONS] --label <LABEL> --program <PROGRAM>
+    Usage: service-manager-ctl install [OPTIONS] --program <PROGRAM> <LABEL>
     
-    Options:
-      -l, --label <LABEL>
+    Arguments:
+      <LABEL>
               Label associated with the service
               
               E.g. `org.example.my_application`
     
+    Options:
       -p, --program <PROGRAM>
               Path to the program to run
               
@@ -79,21 +81,49 @@ FYI: This wraps https://github.com/chipsenkbeil/service-manager-rs; plan to send
 
     Get the service status info
     
-    Usage: service-manager-ctl status --label <LABEL>
+    Usage: service-manager-ctl status <LABEL>
+    
+    Arguments:
+      <LABEL>
+              Label associated with the service
+              
+              E.g. `org.example.my_application`
     
     Options:
-    -l, --label <LABEL>  
-    -h, --help           Print help
+      -h, --help
+              Print help (see a summary with '-h')
 
 ## `start`
 
     Start the service
     
-    Usage: service-manager-ctl start --label <LABEL>
+    Usage: service-manager-ctl start <LABEL>
+    
+    Arguments:
+      <LABEL>
+              Label associated with the service
+              
+              E.g. `org.example.my_application`
     
     Options:
-    -l, --label <LABEL>  
-    -h, --help           Print help
+      -h, --help
+              Print help (see a summary with '-h')
+
+## `stop`
+
+    Stop the service
+    
+    Usage: service-manager-ctl stop <LABEL>
+    
+    Arguments:
+      <LABEL>
+              Label associated with the service
+              
+              E.g. `org.example.my_application`
+    
+    Options:
+      -h, --help
+              Print help (see a summary with '-h')
 
 <hr>
 

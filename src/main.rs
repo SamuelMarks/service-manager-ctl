@@ -37,7 +37,6 @@ enum Commands {
         /// Label associated with the service
         ///
         /// E.g. `org.example.my_application`
-        #[arg(short, long)]
         label: String,
 
         /// Path to the program to run
@@ -85,13 +84,25 @@ enum Commands {
 
     /// Get the service status info
     Status {
-        #[arg(short, long)]
+        /// Label associated with the service
+        ///
+        /// E.g. `org.example.my_application`
         label: String,
     },
 
     /// Start the service
     Start {
-        #[arg(short, long)]
+        /// Label associated with the service
+        ///
+        /// E.g. `org.example.my_application`
+        label: String,
+    },
+
+    /// Stop the service
+    Stop {
+        /// Label associated with the service
+        ///
+        /// E.g. `org.example.my_application`
         label: String,
     },
 }
@@ -175,6 +186,17 @@ fn main() -> std::process::ExitCode {
             }) {
                 Ok(_) => {
                     println!("{{\"label\": \"{label}\", \"status\": \"started\"}}")
+                }
+                Err(e) => panic!("{}", e),
+            }
+        }
+        Some(Commands::Stop { label }) => {
+            let manager = <dyn service_manager::ServiceManager>::native().unwrap();
+            match manager.stop(service_manager::ServiceStopCtx {
+                label: label.parse().unwrap(),
+            }) {
+                Ok(_) => {
+                    println!("{{\"label\": \"{label}\", \"status\": \"stopped\"}}")
                 }
                 Err(e) => panic!("{}", e),
             }
