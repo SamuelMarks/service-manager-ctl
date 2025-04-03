@@ -14,16 +14,30 @@ FYI: This wraps https://github.com/chipsenkbeil/service-manager-rs; plan to send
     Usage: service-manager-ctl [OPTIONS] [COMMAND]
     
     Commands:
-    install  deploys and instantiated the service
-    status   Get the service status info
-    start    Start the service
-    stop     Stop the service
-    help     Print this message or the help of the given subcommand(s)
+      install  deploys and instantiated the service
+      status   Get the service status info
+      start    Start the service
+      stop     Stop the service
+      help     Print this message or the help of the given subcommand(s)
     
     Options:
-    -d, --debug...  Turn debugging information on
-    -h, --help      Print help
-    -V, --version   Print version
+      -d, --debug...
+              Turn debugging information on
+    
+          --service-manager <SERVICE_MANAGER>
+              Possible values:
+              - launchd: Use launchd to manage the service
+              - openrc:  Use OpenRC to manage the service
+              - rcd:     Use rc.d to manage the service
+              - sc:      Use Windows service controller to manage the service
+              - systemd: Use systemd to manage the service
+              - winsw:   Use WinSW to manage the service
+    
+      -h, --help
+              Print help (see a summary with '-h')
+    
+      -V, --version
+              Print version
 
 ## `--version`
 

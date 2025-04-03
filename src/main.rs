@@ -26,6 +26,9 @@ struct Cli {
     #[arg(short, long, action = clap::ArgAction::Count)]
     debug: u8,
 
+    #[arg(long)]
+    service_manager: Option<service_manager::ServiceManagerKind>,
+
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -119,8 +122,15 @@ fn main() -> std::process::ExitCode {
         _ => println!("Don't be crazy"),
     }
 
-    // You can check for the existence of subcommands, and if found use their
-    // matches just as you would the top level cmd
+    let manager = match cli.service_manager {
+        None =>
+        // Get generic service by detecting what is available on the platform
+        {
+            <dyn service_manager::ServiceManager>::native()
+                .expect("Failed to detect management platform")
+        }
+        Some(kind) => Box::new(service_manager::TypedServiceManager::target(kind)),
+    };
     match &cli.command {
         Some(Commands::Install {
             label,
@@ -135,10 +145,6 @@ fn main() -> std::process::ExitCode {
         }) => {
             // Create a label for our service
             let label: service_manager::ServiceLabel = label.parse().unwrap();
-
-            // Get generic service by detecting what is available on the platform
-            let manager = <dyn service_manager::ServiceManager>::native()
-                .expect("Failed to detect management platform");
 
             // Install our service using the underlying service management platform
             manager
@@ -157,7 +163,6 @@ fn main() -> std::process::ExitCode {
         }
         None => {}
         Some(Commands::Status { label }) => {
-            let manager = <dyn service_manager::ServiceManager>::native().unwrap();
             match manager
                 .status(service_manager::ServiceStatusCtx {
                     label: label.parse().unwrap(),
@@ -180,7 +185,6 @@ fn main() -> std::process::ExitCode {
             }
         }
         Some(Commands::Start { label }) => {
-            let manager = <dyn service_manager::ServiceManager>::native().unwrap();
             match manager.start(service_manager::ServiceStartCtx {
                 label: label.parse().unwrap(),
             }) {
@@ -191,7 +195,6 @@ fn main() -> std::process::ExitCode {
             }
         }
         Some(Commands::Stop { label }) => {
-            let manager = <dyn service_manager::ServiceManager>::native().unwrap();
             match manager.stop(service_manager::ServiceStopCtx {
                 label: label.parse().unwrap(),
             }) {
